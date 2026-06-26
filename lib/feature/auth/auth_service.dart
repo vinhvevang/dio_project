@@ -7,7 +7,7 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final response = await ApiClient.dio.post(
+      final Response response = await ApiClient.dio.post(
         '/login',
         data: {
           'username': username,
@@ -15,7 +15,7 @@ class AuthService {
         },
       );
 
-      final token = response.data['data']['access_token'] as String?;
+      final  String? token = response.data['data']['access_token'] as String?;
       if (token == null || token.isEmpty) {
         throw Exception('Không lấy được token từ response');
       }

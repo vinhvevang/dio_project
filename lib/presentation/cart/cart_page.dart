@@ -10,7 +10,7 @@ class CartPage extends GetView<CartController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Giỏ hàng'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFFF24E1E),
         foregroundColor: Colors.white,
         actions: [
           Obx(() => controller.items.isNotEmpty

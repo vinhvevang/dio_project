@@ -18,7 +18,7 @@ class CategoryDrawer extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
-              color: Colors.blue,
+              color: Color(0xFFF24E1E),
               child: const Row(
                 children: [
                   Icon(Icons.category_outlined, color: Colors.white),

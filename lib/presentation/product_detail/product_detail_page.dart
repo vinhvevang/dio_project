@@ -10,7 +10,7 @@ class ProductDetailPage extends GetView<ProductDetailController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chi tiết sản phẩm'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFFF24E1E),
         foregroundColor: Colors.white,
         actions: [
           // Nút sửa

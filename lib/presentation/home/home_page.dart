@@ -12,8 +12,8 @@ class HomePage extends GetView<HomeController> {
     return Scaffold(
       drawer: const CategoryDrawer(),
       appBar: AppBar(
-        title: const Text('Sản phẩm'),
-        backgroundColor: Colors.blue,
+        title: Center(child: const Text('Sản phẩm')),
+        backgroundColor: Color(0xFFF24E1E),
         foregroundColor: Colors.white,
         actions: [
           Obx(() => Stack(
@@ -30,7 +30,7 @@ class HomePage extends GetView<HomeController> {
                       child: Container(
                         padding: const EdgeInsets.all(2),
                         decoration: const BoxDecoration(
-                          color: Colors.red,
+                          color: Colors.blue,
                           shape: BoxShape.circle,
                         ),
                         constraints:
@@ -215,7 +215,7 @@ class HomePage extends GetView<HomeController> {
 
               return RefreshIndicator(
                 onRefresh: controller.refresh,
-                child: ListView.builder(
+                child: GridView.builder(
                   controller: controller.scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.only(bottom: 90),
@@ -236,7 +236,7 @@ class HomePage extends GetView<HomeController> {
                         horizontal: 12,
                         vertical: 5,
                       ),
-                      elevation: 1.5,
+                      elevation: 0.5,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -260,7 +260,7 @@ class HomePage extends GetView<HomeController> {
                                       )
                                     : _placeholder(),
                               ),
-                              const SizedBox(width: 10),
+                            
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,7 +307,7 @@ class HomePage extends GetView<HomeController> {
                                         Text(
                                           '${product.price.toStringAsFixed(0)}đ',
                                           style: const TextStyle(
-                                            color: Colors.blue,
+                                            color: Colors.red,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
@@ -326,8 +326,9 @@ class HomePage extends GetView<HomeController> {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.add_shopping_cart,
-                                    color: Colors.blue),
+                                    color: Color(0xFFF24E1E)),
                                 tooltip: 'Thêm vào giỏ',
+
                                 onPressed: () => controller.addToCart(product),
                               ),
                             ],
@@ -335,7 +336,10 @@ class HomePage extends GetView<HomeController> {
                         ),
                       ),
                     );
-                  },
+                  }, gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.5,
+                    crossAxisSpacing: 3),
                 ),
               );
             }),
@@ -346,7 +350,7 @@ class HomePage extends GetView<HomeController> {
         onPressed: controller.goToAddProduct,
         icon: const Icon(Icons.add),
         label: const Text('Thêm SP'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFFF24E1E),
         foregroundColor: Colors.white,
       ),
     );
@@ -406,7 +410,7 @@ class HomePage extends GetView<HomeController> {
               child: ElevatedButton(
                 onPressed: controller.applyPriceFilter,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Color(0xFFF24E1E),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),

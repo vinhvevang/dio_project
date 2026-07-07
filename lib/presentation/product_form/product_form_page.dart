@@ -11,7 +11,7 @@ class ProductFormPage extends GetView<ProductFormController> {
     return Scaffold(
       appBar: AppBar(
         title: Text(controller.isEditMode ? 'Sửa sản phẩm' : 'Thêm sản phẩm'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFFF24E1E),
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -214,7 +214,7 @@ class ProductFormPage extends GetView<ProductFormController> {
                               ? 'Lưu thay đổi'
                               : 'Tạo sản phẩm')),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: Color(0xFFF24E1E),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8)),

@@ -1,6 +1,9 @@
+import 'package:dio_complete/core/widgets/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:dio_complete/presentation/auth/login_controller.dart';
+import 'package:svg_image/svg_image.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -11,37 +14,21 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
+       
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+             
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.store_rounded,
-                  size: 80,
-                  color: Colors.blue,
+                Container(
+                  height: 100,
+                  width: 200,
+                  child: SvgPicture.asset(
+                    AppImages.biglogo,
+                    fit: BoxFit.contain,
+                  ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'SDS Mobile',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Đăng nhập để tiếp tục',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: Colors.grey),
-                ),
-                const SizedBox(height: 40),
 
                 // Username field
                 TextField(
@@ -84,41 +71,43 @@ class LoginPage extends StatelessWidget {
 
                 // Login button
                 Obx(
-                  () => SizedBox(
+                  () => Container(
+                    width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
                       onPressed:
                           controller.isLoading.value ? null : controller.login,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: Color(0xFFF24E1E),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: controller.isLoading.value
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+                      child:
+                          controller.isLoading.value
+                              ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Text(
+                                'Đăng nhập',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            )
-                          : const Text(
-                              'Đăng nhập',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+        
       ),
     );
   }

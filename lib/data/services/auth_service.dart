@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dio_complete/core/network/api_client.dart';
+import 'package:dio_complete/core/network/dio_error_mapper.dart';
 
 class AuthService {
   Future<String> login({
@@ -23,29 +24,7 @@ class AuthService {
 
       return token;
     } on DioException catch (e) {
-      throw Exception(_dioErrorMessage(e, 'Đăng nhập thất bại'));
+      throw Exception(dioErrorMessage(e, 'Đăng nhập thất bại'));
     }
-  }
-
-  // Lấy message lỗi an toàn, không giả định cứng error body là Map
-  String _dioErrorMessage(DioException e, String fallback) {
-    final data = e.response?.data;
-    final status = e.response?.statusCode;
-    // ignore: avoid_print
-    print('DioException(login) status=$status data=$data');
-
-    if (data is Map && data['message'] != null) {
-      return data['message'].toString();
-    }
-    if (data is List && data.isNotEmpty) {
-      return data.first.toString();
-    }
-    if (data is String && data.trim().isNotEmpty) {
-      return data;
-    }
-    if (status != null) {
-      return '$fallback (HTTP $status)';
-    }
-    return fallback;
   }
 }

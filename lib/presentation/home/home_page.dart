@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio_complete/presentation/category/category_controller.dart';
+import 'package:dio_complete/presentation/category/widgets/category_drawer.dart';
 import 'package:dio_complete/presentation/home/home_controller.dart';
 
 class HomePage extends GetView<HomeController> {
@@ -8,6 +10,7 @@ class HomePage extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const CategoryDrawer(),
       appBar: AppBar(
         title: const Text('Sản phẩm'),
         backgroundColor: Colors.blue,
@@ -112,6 +115,39 @@ class HomePage extends GetView<HomeController> {
               ],
             ),
           ),
+          Obx(() {
+            final category = Get.find<CategoryController>().selectedCategory.value;
+            if (category == null) return const SizedBox.shrink();
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+              child: Row(
+                children: [
+                  Icon(Icons.category_outlined,
+                      size: 14, color: Colors.blue.shade600),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Danh mục: ${category.name}',
+                    style:
+                        TextStyle(fontSize: 12, color: Colors.blue.shade600),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () =>
+                        Get.find<CategoryController>().selectedCategory.value = null,
+                    child: const Text(
+                      'Bỏ lọc',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.red,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
           Obx(() {
             if (!controller.isFilterActive) {
               return const SizedBox.shrink();
@@ -238,6 +274,25 @@ class HomePage extends GetView<HomeController> {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
+                                    if (product.category != null) ...[
+                                      const SizedBox(height: 3),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 1),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue.shade50,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          product.category!.name,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.blue.shade700,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                     const SizedBox(height: 3),
                                     Text(
                                       'Mã: ${product.code}',

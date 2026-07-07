@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio_complete/data/models/category_model.dart';
 import 'package:dio_complete/presentation/product_form/product_form_controller.dart';
 
 class ProductFormPage extends GetView<ProductFormController> {
@@ -98,6 +99,64 @@ class ProductFormPage extends GetView<ProductFormController> {
                   return null;
                 },
               ),
+              const SizedBox(height: 12),
+
+              // ── Danh mục ─────────────────────────────────────────
+              Obx(() {
+                final categories = controller.categoryController.categories;
+
+                if (controller.categoryController.isLoading.value &&
+                    categories.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (categories.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.orange.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline,
+                            size: 18, color: Colors.orange.shade800),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Chưa có danh mục nào. Mở menu bên trái (kéo từ mép trái) để tạo danh mục trước.',
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.orange.shade800),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return DropdownButtonFormField<Category>(
+                  value: controller.selectedCategory.value,
+                  hint: const Text('Chọn danh mục'),
+                  decoration: InputDecoration(
+                    labelText: 'Danh mục *',
+                    prefixIcon: const Icon(Icons.category_outlined),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  items: categories
+                      .map((c) => DropdownMenuItem(
+                            value: c,
+                            child: Text(c.name),
+                          ))
+                      .toList(),
+                  onChanged: controller.selectCategory,
+                  validator: controller.validateCategory,
+                );
+              }),
               const SizedBox(height: 12),
 
               // ── URL ảnh ──────────────────────────────────────────

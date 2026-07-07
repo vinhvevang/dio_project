@@ -106,6 +106,20 @@ class ProductDetailPage extends GetView<ProductDetailController> {
                     // ── Mã sản phẩm ───────────────────────────────
                     Text('Mã SP: ${p.code}',
                         style: const TextStyle(color: Colors.grey)),
+                    const SizedBox(height: 4),
+
+                    // ── Danh mục ──────────────────────────────────
+                    Row(
+                      children: [
+                        Icon(Icons.category_outlined,
+                            size: 14, color: Colors.grey.shade600),
+                        const SizedBox(width: 4),
+                        Text(
+                          p.category?.name ?? 'Chưa phân loại',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 16),
 
                     // ── Giá & Tồn kho ─────────────────────────────

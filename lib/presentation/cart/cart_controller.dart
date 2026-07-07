@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio_complete/core/widgets/confirm_dialog.dart';
 import 'package:dio_complete/data/services/cart_service.dart';
 
 class CartController extends GetxController {
@@ -26,22 +27,13 @@ class CartController extends GetxController {
 
   // Xóa 1 sản phẩm khỏi giỏ
   Future<void> removeItem(int productId) async {
-    final confirmed = await Get.dialog<bool>(AlertDialog(
-      title: const Text('Xóa khỏi giỏ'),
-      content: const Text('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?'),
-      actions: [
-        TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text('Hủy')),
-        ElevatedButton(
-          onPressed: () => Get.back(result: true),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-          child: const Text('Xóa', style: TextStyle(color: Colors.white)),
-        ),
-      ],
-    ));
+    final confirmed = await showConfirmDialog(
+      title: 'Xóa khỏi giỏ',
+      message: 'Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?',
+      confirmLabel: 'Xóa',
+    );
 
-    if (confirmed != true) return;
+    if (!confirmed) return;
 
     await _cartService.removeItem(productId);
     _loadCart();
@@ -52,23 +44,13 @@ class CartController extends GetxController {
 
   // Xóa toàn bộ giỏ
   Future<void> clearCart() async {
-    final confirmed = await Get.dialog<bool>(AlertDialog(
-      title: const Text('Xóa tất cả'),
-      content: const Text('Xóa tất cả sản phẩm trong giỏ hàng?'),
-      actions: [
-        TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text('Hủy')),
-        ElevatedButton(
-          onPressed: () => Get.back(result: true),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-          child: const Text('Xóa hết',
-              style: TextStyle(color: Colors.white)),
-        ),
-      ],
-    ));
+    final confirmed = await showConfirmDialog(
+      title: 'Xóa tất cả',
+      message: 'Xóa tất cả sản phẩm trong giỏ hàng?',
+      confirmLabel: 'Xóa hết',
+    );
 
-    if (confirmed != true) return;
+    if (!confirmed) return;
 
     await _cartService.clearAll();
     _loadCart();

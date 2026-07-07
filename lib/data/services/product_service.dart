@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio_complete/core/network/api_client.dart';
+import 'package:dio_complete/core/network/dio_error_mapper.dart';
+import 'package:dio_complete/data/models/category_model.dart';
 import 'package:dio_complete/data/models/product_model.dart';
 
 class ProductResult {
@@ -17,32 +19,6 @@ class ProductResult {
 }
 
 class ProductService {
-  /// Lấy message lỗi từ DioException một cách an toàn, không giả định cứng
-  /// error body luôn là { "message": "..." } — đây chính là chỗ bị crash
-  /// thật sự (server trả lỗi, body không phải Map, index ['message'] vỡ).
-  String _dioErrorMessage(DioException e, String fallback) {
-    final data = e.response?.data;
-    final status = e.response?.statusCode;
-    // ignore: avoid_print
-    print('DioException status=$status data=$data');
-
-    if (data is Map && data['message'] != null) {
-      return data['message'].toString();
-    }
-    if (data is Map && data['error'] != null) {
-      return data['error'].toString();
-    }
-    if (data is List && data.isNotEmpty) {
-      return data.first.toString();
-    }
-    if (data is String && data.trim().isNotEmpty) {
-      return data;
-    }
-    if (status != null) {
-      return '$fallback (HTTP $status)';
-    }
-    return fallback;
-  }
 
   Map<String, dynamic> _asMap(dynamic value) {
     if (value is Map<String, dynamic>) return value;
@@ -90,6 +66,7 @@ class ProductService {
     required int stock,
     required String description,
     required String image,
+    required Category category,
   }) {
     final now = DateTime.now().toIso8601String();
     return Product(
@@ -103,6 +80,7 @@ class ProductService {
       stock: stock,
       description: description,
       image: image,
+      category: category,
     );
   }
 
@@ -132,7 +110,7 @@ class ProductService {
         count: count,
       );
     } on DioException catch (e) {
-      throw Exception(_dioErrorMessage(e, 'Tải danh sách sản phẩm thất bại'));
+      throw Exception(dioErrorMessage(e, 'Tải danh sách sản phẩm thất bại'));
     }
   }
 
@@ -144,7 +122,7 @@ class ProductService {
       if (e.response?.statusCode == 404) {
         return _findProductById(id);
       }
-      throw Exception(_dioErrorMessage(e, 'Tải chi tiết sản phẩm thất bại'));
+      throw Exception(dioErrorMessage(e, 'Tải chi tiết sản phẩm thất bại'));
     } catch (e) {
       return _findProductById(id);
     }
@@ -157,6 +135,7 @@ class ProductService {
     required int stock,
     required String description,
     required String image,
+    required Category category,
   }) async {
     try {
       final response = await ApiClient.dio.post('/products', data: {
@@ -166,6 +145,10 @@ class ProductService {
         'stock': stock,
         'description': description,
         'image': image,
+        // Ghi (POST/PUT) dùng category_id (số) - khác với đọc (GET) trả về
+        // object "category" lồng đầy đủ. Xác nhận từ dữ liệu JSON thật lấy
+        // về: sản phẩm đã gán danh mục qua field này thành công ở backend.
+        'category_id': category.id,
       });
       dynamic node = response.data;
       if (node is Map && node.containsKey('data')) {
@@ -173,7 +156,11 @@ class ProductService {
       }
 
       if (node is Map || node is List) {
-        return Product.fromJson(_extractSingleProductMap(node));
+        // Đảm bảo category luôn đúng như vừa chọn, phòng khi response backend
+        // không echo lại object category đầy đủ (client vẫn nhất quán với ý
+        // định của người dùng).
+        return Product.fromJson(_extractSingleProductMap(node))
+            .copyWith(category: category);
       }
 
       final int createdId = node is int ? node : DateTime.now().millisecondsSinceEpoch;
@@ -185,9 +172,10 @@ class ProductService {
         stock: stock,
         description: description,
         image: image,
+        category: category,
       );
     } on DioException catch (e) {
-      throw Exception(_dioErrorMessage(e, 'Tạo sản phẩm thất bại'));
+      throw Exception(dioErrorMessage(e, 'Tạo sản phẩm thất bại'));
     } catch (e) {
       throw Exception('Lỗi xử lý dữ liệu sản phẩm: ${e.toString().replaceAll('Exception: ', '')}');
     }
@@ -201,6 +189,7 @@ class ProductService {
     required int stock,
     required String description,
     required String image,
+    required Category category,
   }) async {
     try {
       final response = await ApiClient.dio.put('/products/$id', data: {
@@ -210,6 +199,7 @@ class ProductService {
         'stock': stock,
         'description': description,
         'image': image,
+        'category_id': category.id,
       });
       dynamic node = response.data;
       if (node is Map && node.containsKey('data')) {
@@ -217,7 +207,8 @@ class ProductService {
       }
 
       if (node is Map || node is List) {
-        return Product.fromJson(_extractSingleProductMap(node));
+        return Product.fromJson(_extractSingleProductMap(node))
+            .copyWith(category: category);
       }
 
       return _buildLocalProduct(
@@ -228,9 +219,10 @@ class ProductService {
         stock: stock,
         description: description,
         image: image,
+        category: category,
       );
     } on DioException catch (e) {
-      throw Exception(_dioErrorMessage(e, 'Cập nhật sản phẩm thất bại'));
+      throw Exception(dioErrorMessage(e, 'Cập nhật sản phẩm thất bại'));
     } catch (e) {
       throw Exception('Lỗi xử lý dữ liệu sản phẩm: ${e.toString().replaceAll('Exception: ', '')}');
     }
@@ -240,7 +232,7 @@ class ProductService {
     try {
       await ApiClient.dio.delete('/products/$id');
     } on DioException catch (e) {
-      throw Exception(_dioErrorMessage(e, 'Xóa sản phẩm thất bại'));
+      throw Exception(dioErrorMessage(e, 'Xóa sản phẩm thất bại'));
     }
   }
 
@@ -248,7 +240,7 @@ class ProductService {
     try {
       await ApiClient.dio.get('/reset');
     } on DioException catch (e) {
-      throw Exception(_dioErrorMessage(e, 'Reset dữ liệu thất bại'));
+      throw Exception(dioErrorMessage(e, 'Reset dữ liệu thất bại'));
     }
   }
 }

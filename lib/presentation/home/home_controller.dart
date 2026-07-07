@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dio_complete/core/storage/token_storage.dart';
+import 'package:dio_complete/core/widgets/confirm_dialog.dart';
 import 'package:dio_complete/data/models/product_model.dart';
 import 'package:dio_complete/data/services/cart_service.dart';
 import 'package:dio_complete/data/services/product_service.dart';
+import 'package:dio_complete/presentation/category/category_controller.dart';
 import 'package:dio_complete/routes/app_routes.dart';
 
 class HomeController extends GetxController {
   final _productService = ProductService();
   final _cartService = CartService();
+  final _categoryController = Get.find<CategoryController>();
 
   // ─── Danh sách sản phẩm ───────────────────────────────────────
   final allProducts = <Product>[].obs;    // tất cả đã tải về
@@ -55,6 +58,8 @@ class HomeController extends GetxController {
     // Reactive: gõ search hoặc đổi targetPrice → cập nhật list ngay
     searchText.listen((_) => _applyFilter());
     targetPrice.listen((_) => _applyFilter());
+    // Chọn danh mục ở Drawer -> lọc lại danh sách ngay
+    _categoryController.selectedCategory.listen((_) => _applyFilter());
   }
 
   @override
@@ -107,6 +112,12 @@ class HomeController extends GetxController {
   // ─── Lọc + sắp xếp danh sách hiển thị ────────────────────────
   void _applyFilter() {
     var list = allProducts.toList();
+
+    // 0. Lọc theo danh mục đang chọn ở Drawer (null = "Tất cả")
+    final selectedCategory = _categoryController.selectedCategory.value;
+    if (selectedCategory != null) {
+      list = list.where((p) => p.categoryId == selectedCategory.id).toList();
+    }
 
     // 1. Lọc theo tên
     final query = searchText.value.trim().toLowerCase();
@@ -188,23 +199,13 @@ class HomeController extends GetxController {
 
   // ─── Đăng xuất ────────────────────────────────────────────────
   Future<void> logout() async {
-    final confirmed = await Get.dialog<bool>(AlertDialog(
-      title: const Text('Đăng xuất'),
-      content: const Text('Bạn có chắc muốn đăng xuất?'),
-      actions: [
-        TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text('Hủy')),
-        ElevatedButton(
-          onPressed: () => Get.back(result: true),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-          child:
-              const Text('Đăng xuất', style: TextStyle(color: Colors.white)),
-        ),
-      ],
-    ));
+    final confirmed = await showConfirmDialog(
+      title: 'Đăng xuất',
+      message: 'Bạn có chắc muốn đăng xuất?',
+      confirmLabel: 'Đăng xuất',
+    );
 
-    if (confirmed == true) {
+    if (confirmed) {
       await TokenStorage.clearAll();
       await _cartService.clearAll();
       Get.offAllNamed(AppRoutes.login);

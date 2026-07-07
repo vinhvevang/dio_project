@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio_complete/core/widgets/confirm_dialog.dart';
 import 'package:dio_complete/data/models/product_model.dart';
 import 'package:dio_complete/data/services/product_service.dart';
 import 'package:dio_complete/presentation/home/home_controller.dart';
@@ -66,25 +67,13 @@ class ProductDetailController extends GetxController {
 
   // ─── Xóa sản phẩm (có dialog xác nhận) ───────────────────────
   Future<void> deleteProduct() async {
-    final confirmed = await Get.dialog<bool>(
-      AlertDialog(
-        title: const Text('Xóa sản phẩm'),
-        content: Text(
-            'Xóa "${product.value?.name}"?\nThao tác này không thể hoàn tác.'),
-        actions: [
-          TextButton(
-              onPressed: () => Get.back(result: false),
-              child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () => Get.back(result: true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Xóa', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDialog(
+      title: 'Xóa sản phẩm',
+      message: 'Xóa "${product.value?.name}"?\nThao tác này không thể hoàn tác.',
+      confirmLabel: 'Xóa',
     );
 
-    if (confirmed != true) return;
+    if (!confirmed) return;
 
     isLoading.value = true;
     try {

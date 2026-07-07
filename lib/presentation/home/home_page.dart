@@ -16,38 +16,42 @@ class HomePage extends GetView<HomeController> {
         backgroundColor: Color(0xFFF24E1E),
         foregroundColor: Colors.white,
         actions: [
-          Obx(() => Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.shopping_cart_outlined),
-                    onPressed: controller.goToCart,
-                    tooltip: 'Giỏ hàng',
-                  ),
-                  if (controller.cartCount.value > 0)
-                    Positioned(
-                      right: 6,
-                      top: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
+          Obx(
+            () => Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.shopping_cart_outlined),
+                  onPressed: controller.goToCart,
+                  tooltip: 'Giỏ hàng',
+                ),
+                if (controller.cartCount.value > 0)
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '${controller.cartCount.value}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
                         ),
-                        constraints:
-                            const BoxConstraints(minWidth: 16, minHeight: 16),
-                        child: Text(
-                          '${controller.cartCount.value}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                ],
-              )),
+                  ),
+              ],
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: controller.logout,
@@ -68,15 +72,18 @@ class HomePage extends GetView<HomeController> {
                     decoration: InputDecoration(
                       hintText: 'Tìm kiếm theo tên...',
                       prefixIcon: const Icon(Icons.search),
-                      suffixIcon: Obx(() => controller.searchText.value.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                controller.searchController.clear();
-                                controller.onSearchChanged('');
-                              },
-                            )
-                          : const SizedBox.shrink()),
+                      suffixIcon: Obx(
+                        () =>
+                            controller.searchText.value.isNotEmpty
+                                ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    controller.searchController.clear();
+                                    controller.onSearchChanged('');
+                                  },
+                                )
+                                : const SizedBox.shrink(),
+                      ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -85,56 +92,65 @@ class HomePage extends GetView<HomeController> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Obx(() => Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.tune),
-                          tooltip: 'Lọc theo giá',
-                          style: IconButton.styleFrom(
-                            backgroundColor: controller.isFilterActive
-                                ? Colors.blue.shade50
-                                : null,
-                          ),
-                          onPressed: () => _showPriceFilter(context),
+                Obx(
+                  () => Stack(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.tune),
+                        tooltip: 'Lọc theo giá',
+                        style: IconButton.styleFrom(
+                          backgroundColor:
+                              controller.isFilterActive
+                                  ? Colors.blue.shade50
+                                  : null,
                         ),
-                        if (controller.isFilterActive)
-                          Positioned(
-                            right: 6,
-                            top: 6,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
+                        onPressed: () => _showPriceFilter(context),
+                      ),
+                      if (controller.isFilterActive)
+                        Positioned(
+                          right: 6,
+                          top: 6,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
                             ),
                           ),
-                      ],
-                    )),
+                        ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
           Obx(() {
-            final category = Get.find<CategoryController>().selectedCategory.value;
+            final category =
+                Get.find<CategoryController>().selectedCategory.value;
             if (category == null) return const SizedBox.shrink();
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
               child: Row(
                 children: [
-                  Icon(Icons.category_outlined,
-                      size: 14, color: Colors.blue.shade600),
+                  Icon(
+                    Icons.category_outlined,
+                    size: 14,
+                    color: Colors.blue.shade600,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     'Danh mục: ${category.name}',
-                    style:
-                        TextStyle(fontSize: 12, color: Colors.blue.shade600),
+                    style: TextStyle(fontSize: 12, color: Colors.blue.shade600),
                   ),
                   const Spacer(),
                   GestureDetector(
-                    onTap: () =>
-                        Get.find<CategoryController>().selectedCategory.value = null,
+                    onTap:
+                        () =>
+                            Get.find<CategoryController>()
+                                .selectedCategory
+                                .value = null,
                     child: const Text(
                       'Bỏ lọc',
                       style: TextStyle(
@@ -157,13 +173,11 @@ class HomePage extends GetView<HomeController> {
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
               child: Row(
                 children: [
-                  Icon(Icons.filter_alt,
-                      size: 14, color: Colors.blue.shade600),
+                  Icon(Icons.filter_alt, size: 14, color: Colors.blue.shade600),
                   const SizedBox(width: 4),
                   Text(
                     'Sắp xếp gần giá: ${controller.targetPrice.value.toStringAsFixed(0)}đ',
-                    style:
-                        TextStyle(fontSize: 12, color: Colors.blue.shade600),
+                    style: TextStyle(fontSize: 12, color: Colors.blue.shade600),
                   ),
                   const Spacer(),
                   GestureDetector(
@@ -183,7 +197,8 @@ class HomePage extends GetView<HomeController> {
           }),
           Expanded(
             child: Obx(() {
-              if (controller.isLoading.value && controller.shownProducts.isEmpty) {
+              if (controller.isLoading.value &&
+                  controller.shownProducts.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
 
@@ -198,8 +213,11 @@ class HomePage extends GetView<HomeController> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.inventory_2_outlined,
-                                size: 64, color: Colors.grey),
+                            Icon(
+                              Icons.inventory_2_outlined,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
                             SizedBox(height: 8),
                             Text(
                               'Không tìm thấy sản phẩm',
@@ -218,128 +236,160 @@ class HomePage extends GetView<HomeController> {
                 child: GridView.builder(
                   controller: controller.scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 90),
-                  itemCount: controller.shownProducts.length +
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 90),
+                  itemCount:
+                      controller.shownProducts.length +
                       (controller.isLoadingMore.value ? 1 : 0),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.5,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
                   itemBuilder: (context, index) {
                     if (index >= controller.shownProducts.length) {
-                      return const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(child: CircularProgressIndicator()),
-                      );
+                      return const Center(child: CircularProgressIndicator());
                     }
 
                     final product = controller.shownProducts[index];
 
                     return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 5,
-                      ),
-                      elevation: 0.5,
+                      margin: EdgeInsets.zero,
+                      elevation: 1,
+                      clipBehavior: Clip.antiAlias,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(10),
                         onTap: () => controller.goToDetail(product),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: product.image.isNotEmpty
-                                    ? Image.network(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Ảnh vuông full-width, nút giỏ hàng nổi góc dưới-phải -
+                            // chuẩn cho card lưới 2 cột, thay vì Row ngang bị nhồi ép.
+                            AspectRatio(
+                              aspectRatio: 1,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  product.image.isNotEmpty
+                                      ? Image.network(
                                         product.image,
-                                        width: 65,
-                                        height: 65,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) =>
-                                            _placeholder(),
+                                        errorBuilder:
+                                            (_, __, ___) => _placeholder(),
                                       )
-                                    : _placeholder(),
+                                      : _placeholder(),
+                                  Positioned(
+                                    right: 6,
+                                    bottom: 6,
+                                    child: Material(
+                                      color: Colors.white,
+                                      shape: const CircleBorder(),
+                                      elevation: 2,
+                                      child: InkWell(
+                                        customBorder: const CircleBorder(),
+                                        onTap:
+                                            () => controller.addToCart(product),
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(7),
+                                          child: Icon(
+                                            Icons.add_shopping_cart,
+                                            size: 18,
+                                            color: Color(0xFFF24E1E),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      product.name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                            ),
+
+                            // Thông tin bên dưới ảnh
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    product.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      height: 1.2,
                                     ),
-                                    if (product.category != null) ...[
-                                      const SizedBox(height: 3),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 6, vertical: 1),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue.shade50,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          product.category!.name,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.blue.shade700,
-                                          ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if (product.category != null) ...[
+                                    const SizedBox(height: 4),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade50,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        product.category!.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.blue.shade700,
                                         ),
                                       ),
-                                    ],
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      'Mã: ${product.code}',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          '${product.price.toStringAsFixed(0)}đ',
-                                          style: const TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Kho: ${product.stock}',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ],
-                                ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Mã: ${product.code}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${product.price.toStringAsFixed(0)}đ',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xFFF24E1E),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Kho: ${product.stock}',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color:
+                                          product.stock <= 5
+                                              ? Colors.red
+                                              : Colors.grey,
+                                      fontWeight:
+                                          product.stock <= 5
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.add_shopping_cart,
-                                    color: Color(0xFFF24E1E)),
-                                tooltip: 'Thêm vào giỏ',
-
-                                onPressed: () => controller.addToCart(product),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     );
-                  }, gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.5,
-                    crossAxisSpacing: 3),
+                  },
                 ),
               );
             }),
@@ -380,8 +430,10 @@ class HomePage extends GetView<HomeController> {
                     controller.clearPriceFilter();
                     Get.back();
                   },
-                  child:
-                      const Text('Xóa lọc', style: TextStyle(color: Colors.red)),
+                  child: const Text(
+                    'Xóa lọc',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
               ],
             ),
@@ -428,9 +480,9 @@ class HomePage extends GetView<HomeController> {
   }
 
   Widget _placeholder() => Container(
-        width: 65,
-        height: 65,
-        color: Colors.grey.shade200,
-        child: const Icon(Icons.image, color: Colors.grey),
-      );
+    width: 65,
+    height: 65,
+    color: Colors.grey.shade200,
+    child: const Icon(Icons.image, color: Colors.grey),
+  );
 }

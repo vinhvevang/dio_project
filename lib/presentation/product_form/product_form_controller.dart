@@ -17,6 +17,13 @@ class ProductFormController extends GetxController {
   final descriptionController = TextEditingController();
   final imageController = TextEditingController();
 
+  final nameFocusNode = FocusNode();
+  final codeFocusNode = FocusNode();
+  final priceFocusNode = FocusNode();
+  final stockFocusNode = FocusNode();
+  final descriptionFocusNode = FocusNode();
+  final imageFocusNode = FocusNode();
+
   // Observable riêng để preview ảnh
   final imageUrl = ''.obs;
 
@@ -49,6 +56,13 @@ class ProductFormController extends GetxController {
     stockController.dispose();
     descriptionController.dispose();
     imageController.dispose();
+
+    nameFocusNode.dispose();
+    codeFocusNode.dispose();
+    priceFocusNode.dispose();
+    stockFocusNode.dispose();
+    descriptionFocusNode.dispose();
+    imageFocusNode.dispose();
     super.onClose();
   }
 

@@ -26,8 +26,16 @@ class HomeController extends GetxController {
   final cartCount = 0.obs;
 
   // ─── Tìm kiếm ────────────────────────────────────────────────
-  final searchController = TextEditingController();
-  final searchText = ''.obs;
+  // SearchController (Flutter, kế thừa TextEditingController) để dùng với
+  // SearchAnchor.bar - đọc trực tiếp searchController.text lúc lọc thay vì
+  // lưu thêm 1 biến "searchText" riêng dễ bị lệch với nội dung ô nhập.
+  final searchController = SearchController();
+
+  /// Lịch sử tìm kiếm gần đây (mới nhất ở đầu). Chỉ ghi khi người dùng THẬT
+  /// SỰ chốt một lượt tìm kiếm (Enter hoặc chọn gợi ý), không ghi theo từng
+  /// ký tự gõ dở.
+  static const _maxRecentSearches = 8;
+  final recentSearches = <String>[].obs;
 
   // ─── Lọc theo giá (sort by nearest) ──────────────────────────
   final priceFilterController = TextEditingController();
@@ -55,8 +63,8 @@ class HomeController extends GetxController {
       }
     });
 
-    // Reactive: gõ search hoặc đổi targetPrice → cập nhật list ngay
-    searchText.listen((_) => _applyFilter());
+    // Reactive: đổi targetPrice → cập nhật list ngay (tìm kiếm gọi
+    // _applyFilter() trực tiếp qua onSearchChanged, xem bên dưới)
     targetPrice.listen((_) => _applyFilter());
     // Chọn danh mục ở Drawer -> lọc lại danh sách ngay
     _categoryController.selectedCategory.listen((_) => _applyFilter());
@@ -120,7 +128,7 @@ class HomeController extends GetxController {
     }
 
     // 1. Lọc theo tên
-    final query = searchText.value.trim().toLowerCase();
+    final query = searchController.text.trim().toLowerCase();
     if (query.isNotEmpty) {
       list = list.where((p) => p.name.toLowerCase().contains(query)).toList();
     }
@@ -138,8 +146,24 @@ class HomeController extends GetxController {
   }
 
   // ─── Search callback ──────────────────────────────────────────
-  void onSearchChanged(String value) {
-    searchText.value = value;
+  void onSearchChanged(String _) => _applyFilter();
+
+  /// Ghi 1 từ khóa vào lịch sử tìm kiếm gần đây. Chỉ gọi khi người dùng chốt
+  /// một lượt tìm kiếm (Enter hoặc chọn gợi ý).
+  void commitSearch(String keyword) {
+    final trimmed = keyword.trim();
+    if (trimmed.isEmpty) return;
+
+    recentSearches.removeWhere((s) => s.toLowerCase() == trimmed.toLowerCase());
+    recentSearches.insert(0, trimmed);
+
+    if (recentSearches.length > _maxRecentSearches) {
+      recentSearches.removeRange(_maxRecentSearches, recentSearches.length);
+    }
+  }
+
+  void removeRecentSearch(String term) {
+    recentSearches.remove(term);
   }
 
   // ─── Áp dụng filter giá (từ bottom sheet) ───────────────────

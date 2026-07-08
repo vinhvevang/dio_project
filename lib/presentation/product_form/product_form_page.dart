@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio_complete/core/widgets/app_text_field.dart';
 import 'package:dio_complete/data/models/category_model.dart';
 import 'package:dio_complete/presentation/product_form/product_form_controller.dart';
 
@@ -48,10 +49,12 @@ class ProductFormPage extends GetView<ProductFormController> {
               }),
 
               // ── Tên sản phẩm ────────────────────────────────────
-              _buildField(
-                ctrl: controller.nameController,
+              AppTextFormField(
+                controller: controller.nameController,
+                focusNode: controller.nameFocusNode,
+                nextFocus: controller.codeFocusNode,
                 label: 'Tên sản phẩm *',
-                hint: 'Nhập tên sản phẩm',
+                hintText: 'Nhập tên sản phẩm',
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? 'Tên không được để trống'
                     : null,
@@ -59,10 +62,12 @@ class ProductFormPage extends GetView<ProductFormController> {
               const SizedBox(height: 12),
 
               // ── Mã sản phẩm ─────────────────────────────────────
-              _buildField(
-                ctrl: controller.codeController,
+              AppTextFormField(
+                controller: controller.codeController,
+                focusNode: controller.codeFocusNode,
+                nextFocus: controller.priceFocusNode,
                 label: 'Mã sản phẩm *',
-                hint: 'VD: DHN-001',
+                hintText: 'VD: DHN-001',
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? 'Mã không được để trống'
                     : null,
@@ -70,13 +75,17 @@ class ProductFormPage extends GetView<ProductFormController> {
               const SizedBox(height: 12),
 
               // ── Giá ─────────────────────────────────────────────
-              _buildField(
-                ctrl: controller.priceController,
+              AppTextFormField(
+                controller: controller.priceController,
+                focusNode: controller.priceFocusNode,
+                nextFocus: controller.stockFocusNode,
                 label: 'Giá (đ) *',
-                hint: 'VD: 120000',
+                hintText: 'VD: 120000',
                 keyboardType: TextInputType.number,
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Giá không được để trống';
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Giá không được để trống';
+                  }
                   final val = int.tryParse(v.trim());
                   if (val == null) return 'Giá phải là số nguyên';
                   if (val < 0) return 'Giá không được âm';
@@ -86,13 +95,20 @@ class ProductFormPage extends GetView<ProductFormController> {
               const SizedBox(height: 12),
 
               // ── Số lượng ─────────────────────────────────────────
-              _buildField(
-                ctrl: controller.stockController,
+              // Field cuối trước Danh mục (Dropdown không nằm trong chuỗi
+              // focus vì nó không phải bàn phím) - nên Enter ở đây chuyển
+              // luôn tới URL ảnh (field văn bản tiếp theo sau Dropdown).
+              AppTextFormField(
+                controller: controller.stockController,
+                focusNode: controller.stockFocusNode,
+                nextFocus: controller.imageFocusNode,
                 label: 'Số lượng *',
-                hint: 'VD: 10',
+                hintText: 'VD: 10',
                 keyboardType: TextInputType.number,
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Số lượng không được để trống';
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Số lượng không được để trống';
+                  }
                   final val = int.tryParse(v.trim());
                   if (val == null) return 'Số lượng phải là số nguyên';
                   if (val < 0) return 'Số lượng không được âm';
@@ -160,17 +176,17 @@ class ProductFormPage extends GetView<ProductFormController> {
               const SizedBox(height: 12),
 
               // ── URL ảnh ──────────────────────────────────────────
-              TextFormField(
+              AppTextFormField(
                 controller: controller.imageController,
-                decoration: InputDecoration(
-                  labelText: 'URL ảnh *',
-                  hintText: 'https://...',
-                  prefixIcon: const Icon(Icons.image_outlined),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
+                focusNode: controller.imageFocusNode,
+                nextFocus: controller.descriptionFocusNode,
+                label: 'URL ảnh *',
+                hintText: 'https://...',
+                prefixIcon: const Icon(Icons.image_outlined),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'URL ảnh không được để trống';
+                  if (v == null || v.trim().isEmpty) {
+                    return 'URL ảnh không được để trống';
+                  }
                   final uri = Uri.tryParse(v.trim());
                   if (uri == null || !uri.hasScheme) return 'URL không hợp lệ';
                   return null;
@@ -179,16 +195,14 @@ class ProductFormPage extends GetView<ProductFormController> {
               const SizedBox(height: 12),
 
               // ── Mô tả ────────────────────────────────────────────
-              TextFormField(
+              // Field cuối cùng: nhấn Enter/Done coi như bấm nút submit.
+              AppTextFormField(
                 controller: controller.descriptionController,
+                focusNode: controller.descriptionFocusNode,
+                onSubmit: controller.submit,
                 maxLines: 4,
-                decoration: InputDecoration(
-                  labelText: 'Mô tả',
-                  hintText: 'Nhập mô tả sản phẩm...',
-                  alignLabelWithHint: true,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
+                label: 'Mô tả',
+                hintText: 'Nhập mô tả sản phẩm...',
               ),
               const SizedBox(height: 24),
 
@@ -225,25 +239,6 @@ class ProductFormPage extends GetView<ProductFormController> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildField({
-    required TextEditingController ctrl,
-    required String label,
-    required String hint,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: ctrl,
-      keyboardType: keyboardType,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_complete/core/storage/token_storage.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://192.168.1.12:1997/api/v1';
+  static const String baseUrl = 'http://192.168.1.35:1997/api/v1';
 
   static final Dio dio = Dio(
       BaseOptions(

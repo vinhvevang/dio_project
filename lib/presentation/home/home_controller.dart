@@ -231,7 +231,12 @@ class HomeController extends GetxController {
 
     if (confirmed) {
       await TokenStorage.clearAll();
-      await _cartService.clearAll();
+      // KHÔNG xóa giỏ hàng ở đây nữa. App chỉ có 1 tài khoản/thiết bị (không
+      // có khái niệm nhiều user khác nhau đăng nhập cùng máy), nên giỏ hàng
+      // nên tồn tại xuyên suốt các lần đăng nhập - giống cách nó đã tồn tại
+      // xuyên suốt việc tắt/mở lại app (Hive lưu trên đĩa, không liên quan gì
+      // tới phiên đăng nhập). Muốn xóa giỏ hàng, người dùng đã có sẵn nút
+      // "Xóa tất cả" riêng trong màn giỏ hàng (cart_controller.clearCart()).
       Get.offAllNamed(AppRoutes.login);
     }
   }

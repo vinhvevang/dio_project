@@ -36,8 +36,7 @@ class CategoryDrawer extends StatelessWidget {
             ),
             Expanded(
               child: Obx(() {
-                if (controller.isLoading.value &&
-                    controller.categories.isEmpty) {
+                if (controller.isLoading.value && controller.categories.isEmpty) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
@@ -76,18 +75,13 @@ class CategoryDrawer extends StatelessWidget {
                             IconButton(
                               icon: const Icon(Icons.edit_outlined, size: 20),
                               tooltip: 'Sửa danh mục',
-                              onPressed:
-                                  () => controller.openEditDialog(category),
+                              onPressed: () => controller.openEditDialog(category),
                             ),
                             IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                size: 20,
-                                color: Colors.red,
-                              ),
+                              icon: const Icon(Icons.delete_outline,
+                                  size: 20, color: Colors.red),
                               tooltip: 'Xóa danh mục',
-                              onPressed:
-                                  () => controller.confirmAndDelete(category),
+                              onPressed: () => controller.confirmAndDelete(category),
                             ),
                           ],
                         ),
@@ -107,6 +101,32 @@ class CategoryDrawer extends StatelessWidget {
                   onPressed: controller.openAddDialog,
                   icon: const Icon(Icons.add),
                   label: const Text('Thêm danh mục'),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: Obx(
+                  () => TextButton.icon(
+                    onPressed: controller.isDistributing.value
+                        ? null
+                        : controller.distributeProductsIntoCategories,
+                    icon: controller.isDistributing.value
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.shuffle, size: 18),
+                    label: Text(
+                      controller.isDistributing.value
+                          ? 'Đang phân bổ...'
+                          : 'Phân bổ sản phẩm hiện có vào danh mục',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio_complete/core/bindings/app_binding.dart';
 import 'package:dio_complete/routes/app_pages.dart';
 import 'package:dio_complete/routes/app_routes.dart';
 
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.blue,
       ),
+      initialBinding: AppBinding(),
       initialRoute: AppRoutes.login,
       getPages: AppPages.pages,
     );

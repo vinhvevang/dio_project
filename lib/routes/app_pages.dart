@@ -1,14 +1,14 @@
 import 'package:get/get.dart';
-import 'package:dio_complete/presentation/auth/login_binding.dart';
-import 'package:dio_complete/presentation/auth/login_page.dart';
-import 'package:dio_complete/presentation/home/home_binding.dart';
-import 'package:dio_complete/presentation/home/home_page.dart';
-import 'package:dio_complete/presentation/product_detail/product_detail_binding.dart';
-import 'package:dio_complete/presentation/product_detail/product_detail_page.dart';
-import 'package:dio_complete/presentation/product_form/product_form_binding.dart';
-import 'package:dio_complete/presentation/product_form/product_form_page.dart';
-import 'package:dio_complete/presentation/cart/cart_binding.dart';
-import 'package:dio_complete/presentation/cart/cart_page.dart';
+import 'package:dio_complete/features/auth/presentation/bindings/login_binding.dart';
+import 'package:dio_complete/features/auth/presentation/pages/login_page.dart';
+import 'package:dio_complete/features/product/presentation/bindings/home_binding.dart';
+import 'package:dio_complete/features/product/presentation/pages/home_page.dart';
+import 'package:dio_complete/features/product/presentation/bindings/product_detail_binding.dart';
+import 'package:dio_complete/features/product/presentation/pages/product_detail_page.dart';
+import 'package:dio_complete/features/product/presentation/bindings/product_form_binding.dart';
+import 'package:dio_complete/features/product/presentation/pages/product_form_page.dart';
+import 'package:dio_complete/features/cart/presentation/bindings/cart_binding.dart';
+import 'package:dio_complete/features/cart/presentation/pages/cart_page.dart';
 import 'package:dio_complete/routes/app_routes.dart';
 
 abstract class AppPages {

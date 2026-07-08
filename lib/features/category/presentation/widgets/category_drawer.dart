@@ -1,0 +1,113 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:dio_complete/features/category/presentation/controllers/category_controller.dart';
+
+/// Drawer kéo từ mép trái (tự động nhờ Scaffold.drawer) để chọn danh mục lọc
+/// sản phẩm ở Home, kèm thêm/sửa/xóa danh mục ngay tại đây.
+class CategoryDrawer extends StatelessWidget {
+  const CategoryDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<CategoryController>();
+
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              color: Color(0xFFF24E1E),
+              child: const Row(
+                children: [
+                  Icon(Icons.category_outlined, color: Colors.white),
+                  SizedBox(width: 10),
+                  Text(
+                    'Danh mục',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value && controller.categories.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.apps),
+                      title: const Text('Tất cả sản phẩm'),
+                      selected: controller.selectedCategory.value == null,
+                      selectedTileColor: Colors.blue.shade50,
+                      onTap: () => controller.selectCategory(null),
+                    ),
+                    const Divider(height: 1),
+                    if (controller.categories.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text(
+                          'Chưa có danh mục nào',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    ...controller.categories.map((category) {
+                      final isSelected =
+                          controller.selectedCategory.value?.id == category.id;
+
+                      return ListTile(
+                        leading: const Icon(Icons.label_outline),
+                        title: Text(category.name),
+                        selected: isSelected,
+                        selectedTileColor: Colors.blue.shade50,
+                        onTap: () => controller.selectCategory(category),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined, size: 20),
+                              tooltip: 'Sửa danh mục',
+                              onPressed: () => controller.openEditDialog(category),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline,
+                                  size: 20, color: Colors.red),
+                              tooltip: 'Xóa danh mục',
+                              onPressed: () => controller.confirmAndDelete(category),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                );
+              }),
+            ),
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+              child: SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: OutlinedButton.icon(
+                  onPressed: controller.openAddDialog,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Thêm danh mục'),
+                ),
+              ),
+            ),
+          
+          ],
+        ),
+      ),
+    );
+  }
+}

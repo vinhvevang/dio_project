@@ -1,0 +1,241 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:dio_complete/core/widgets/app_formatter.dart';
+import 'package:dio_complete/features/product/presentation/controllers/product_detail_controller.dart';
+
+class ProductDetailPage extends GetView<ProductDetailController> {
+  const ProductDetailPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Chi tiết sản phẩm'),
+        backgroundColor: Color(0xFFF24E1E),
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: 'Sửa sản phẩm',
+            onPressed: controller.goToEdit,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Xóa sản phẩm',
+            onPressed: controller.deleteProduct,
+          ),
+        ],
+      ),
+      body: Obx(() {
+        // Đang tải lần đầu
+        if (controller.isLoading.value && controller.product.value == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final p = controller.product.value;
+        if (p == null) {
+          return const Center(child: Text('Không tìm thấy sản phẩm'));
+        }
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Ảnh sản phẩm ──────────────────────────────────
+              if (p.image.isNotEmpty)
+                SizedBox(
+                  width: double.infinity,
+                  height: 240,
+                  child: Image.network(
+                    p.image,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: Colors.grey.shade200,
+                      child: const Icon(Icons.broken_image,
+                          size: 60, color: Colors.grey),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  width: double.infinity,
+                  height: 180,
+                  color: Colors.grey.shade200,
+                  child: const Icon(Icons.image, size: 60, color: Colors.grey),
+                ),
+
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Tên & trạng thái ─────────────────────────
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            p.name,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: p.status == 1
+                                ? Colors.green.shade100
+                                : Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            p.status == 1 ? 'Còn bán' : 'Ngừng bán',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: p.status == 1
+                                  ? Colors.green.shade700
+                                  : Colors.grey.shade600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // ── Mã sản phẩm ───────────────────────────────
+                    Text('Mã SP: ${p.code}',
+                        style: const TextStyle(color: Colors.grey)),
+                    const SizedBox(height: 4),
+
+                    // ── Danh mục ──────────────────────────────────
+                    Row(
+                      children: [
+                        Icon(Icons.category_outlined,
+                            size: 14, color: Colors.grey.shade600),
+                        const SizedBox(width: 4),
+                        Text(
+                          p.category?.name ?? 'Chưa phân loại',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    Obx(() => Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            controller.cartQuantity.value > 0
+                                ? 'Đã thêm vào giỏ: ${controller.cartQuantity.value}'
+                                : 'Chưa có trong giỏ hàng',
+                            style: TextStyle(
+                              color: Colors.blue.shade700,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )),
+                    const SizedBox(height: 16),
+
+                    // ── Giá & Tồn kho ─────────────────────────────
+                    Row(
+                      children: [
+                        _infoBox(
+                          label: 'Giá bán',
+                          value: AppFormatter.currency(p.price),
+                          color: Colors.blue.shade50,
+                          textColor: Colors.blue,
+                        ),
+                        const SizedBox(width: 12),
+                        _infoBox(
+                          label: 'Tồn kho',
+                          value: '${p.stock} cái',
+                          color: Colors.orange.shade50,
+                          textColor: Colors.orange.shade700,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // ── Mô tả ─────────────────────────────────────
+                    if (p.description.isNotEmpty) ...[
+                      const Text('Mô tả',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 14)),
+                      const SizedBox(height: 6),
+                      Text(p.description,
+                          style: const TextStyle(
+                              height: 1.5, color: Colors.black87)),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // ── Ngày tạo / cập nhật ───────────────────────
+                    const Divider(),
+                    const SizedBox(height: 8),
+                    _metaRow('Ngày tạo', _formatDate(p.createdAt)),
+                    const SizedBox(height: 4),
+                    _metaRow('Cập nhật', _formatDate(p.updatedAt)),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  // ── Widget ô thông tin ────────────────────────────────────────
+  Widget _infoBox({
+    required String label,
+    required String value,
+    required Color color,
+    required Color textColor,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: TextStyle(fontSize: 12, color: textColor)),
+            const SizedBox(height: 4),
+            Text(value,
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: textColor)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _metaRow(String label, String value) => Row(
+        children: [
+          Text('$label: ',
+              style: const TextStyle(color: Colors.grey, fontSize: 12)),
+          Expanded(
+            child: Text(value,
+                style: const TextStyle(fontSize: 12),
+                overflow: TextOverflow.ellipsis),
+          ),
+        ],
+      );
+
+  String _formatDate(String raw) {
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) return raw;
+    final day = parsed.day.toString().padLeft(2, '0');
+    final month = parsed.month.toString().padLeft(2, '0');
+    return '$day/$month/${parsed.year}';
+  }
+}

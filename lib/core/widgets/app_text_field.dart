@@ -15,11 +15,14 @@ class AppTextFormField extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final int maxLines;
-
+  // final bool isSubmit;
   final FocusNode? focusNode;
   final TextInputAction? textInputAction;
   final void Function(String)? onChanged;
   final VoidCallback? onEditingComplete;
+  final AutovalidateMode? autovalidateMode;
+  final Widget? suffixIcon;
+  final bool autofocus;
 
   /// Nếu có: nhấn Enter/Next tự chuyển focus sang field này.
   final FocusNode? nextFocus;
@@ -32,6 +35,7 @@ class AppTextFormField extends StatelessWidget {
     super.key,
     required this.controller,
     required this.label,
+    // this.isSubmit = false,
     this.hintText,
     this.validator,
     this.obscureText = false,
@@ -45,6 +49,9 @@ class AppTextFormField extends StatelessWidget {
     this.onEditingComplete,
     this.nextFocus,
     this.onSubmit,
+    this.autovalidateMode,
+    this.suffixIcon,
+    this.autofocus = false,
   });
 
   @override
@@ -65,9 +72,28 @@ class AppTextFormField extends StatelessWidget {
       onEditingComplete?.call();
     }
 
+    Widget? buildSuffixIcon() {
+      if (suffixIcon != null) return suffixIcon;
+      return ValueListenableBuilder<TextEditingValue>(
+        valueListenable: controller,
+        builder: (context, value, _) {
+          if (value.text.isEmpty) return const SizedBox.shrink();
+          return IconButton(
+            icon: const Icon(Icons.close, size: 20),
+            onPressed: () {
+              controller.clear();
+              onChanged?.call('');
+            },
+          );
+        },
+      );
+    }
+
     return TextFormField(
+      // autovalidateMode: isSubmit ? AutovalidateMode.onUserInteraction :  AutovalidateMode.disabled,
       controller: controller,
       focusNode: focusNode,
+      autofocus: autofocus,
       obscureText: obscureText,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
@@ -78,26 +104,14 @@ class AppTextFormField extends StatelessWidget {
           (nextFocus != null || onSubmit != null || onEditingComplete != null)
           ? handleEditingComplete
           : null,
+      autovalidateMode: autovalidateMode,
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,
         prefixIcon: prefixIcon,
+        suffixIcon: buildSuffixIcon(),
         border: const OutlineInputBorder(),
-        // Nút "x" chỉ hiện khi ô đang có chữ, bấm là xóa sạch ngay.
-        suffixIcon: ValueListenableBuilder<TextEditingValue>(
-          valueListenable: controller,
-          builder: (context, value, _) {
-            if (value.text.isEmpty) return const SizedBox.shrink();
-            return IconButton(
-              icon: const Icon(Icons.close, size: 20),
-              onPressed: () {
-                controller.clear();
-                onChanged?.call('');
-              },
-            );
-          },
-        ),
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:dio_complete/features/auth/presentation/bindings/login_binding.dart';
-import 'package:dio_complete/features/auth/presentation/pages/login_page.dart';
+import 'package:dio_complete/features/login/presentation/bindings/login_binding.dart';
+import 'package:dio_complete/features/login/presentation/pages/login_page.dart';
 import 'package:dio_complete/features/product/presentation/bindings/home_binding.dart';
 import 'package:dio_complete/features/product/presentation/pages/home_page.dart';
 import 'package:dio_complete/features/product/presentation/bindings/product_detail_binding.dart';

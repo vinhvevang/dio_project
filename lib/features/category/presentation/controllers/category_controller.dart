@@ -20,6 +20,7 @@ class CategoryController extends GetxController {
 
   final isLoading = false.obs;
   final isDistributing = false.obs;
+  final isSubmittingCategory = false.obs;
 
   @override
   void onInit() {
@@ -56,6 +57,7 @@ class CategoryController extends GetxController {
 
     if (name == null) return;
 
+    isSubmittingCategory.value = true;
     try {
       final id = await _categoryUseCase.createCategory(name: name);
       // API tạo danh mục chỉ trả về id (data: 5), không trả nguyên object,
@@ -65,16 +67,19 @@ class CategoryController extends GetxController {
       categories.add(
         Category(id: id, status: 1, createdAt: now, updatedAt: now, name: name),
       );
-      await showAppMessageDialog(
-        title: 'Thành công',
-        message: 'Đã thêm danh mục "$name"',
-        isSuccess: true,
+      Get.snackbar(
+        'Thành công',
+        'Đã thêm danh mục "$name"',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade100,
       );
     } catch (e) {
       await showAppMessageDialog(
         title: 'Lỗi',
         message: e.toString().replaceAll('Exception: ', ''),
       );
+    } finally {
+      isSubmittingCategory.value = false;
     }
   }
 

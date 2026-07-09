@@ -87,6 +87,22 @@ class CategoryDrawer extends StatelessWidget {
                         ),
                       );
                     }),
+                    // Loading khi đang tạo danh mục mới - đặt TRONG ListView,
+                    // ngay sau danh mục cuối cùng, thay vì sau Expanded (chỗ
+                    // đó bị đẩy xuống tận đáy Drawer vì Expanded chiếm hết
+                    // khoảng trống còn thừa). Đặt ở đây thì nó luôn bám sát
+                    // ngay dưới danh sách dù danh sách dài hay ngắn.
+                    if (controller.isSubmittingCategory.value)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Center(
+                          child: SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2.5),
+                          ),
+                        ),
+                      ),
                   ],
                 );
               }),
@@ -97,14 +113,19 @@ class CategoryDrawer extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 height: 44,
-                child: OutlinedButton.icon(
-                  onPressed: controller.openAddDialog,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Thêm danh mục'),
+                child: Obx(
+                  () => OutlinedButton.icon(
+                    // Disable trong lúc đang submit để tránh bấm thêm lần nữa
+                    // khi danh mục trước đó còn chưa tạo xong.
+                    onPressed: controller.isSubmittingCategory.value
+                        ? null
+                        : controller.openAddDialog,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Thêm danh mục'),
+                  ),
                 ),
               ),
             ),
-          
           ],
         ),
       ),

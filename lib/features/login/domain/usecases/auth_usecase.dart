@@ -1,4 +1,4 @@
-import 'package:dio_complete/features/auth/domain/repositories/auth_repository.dart';
+import 'package:dio_complete/features/login/domain/repositories/auth_repository.dart';
 
 class AuthUseCase {
   final AuthRepository _repository;

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio_complete/core/network/api_client.dart';
 import 'package:dio_complete/core/network/dio_error_mapper.dart';
-import 'package:dio_complete/features/auth/domain/repositories/auth_repository.dart';
+import 'package:dio_complete/features/login/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   @override

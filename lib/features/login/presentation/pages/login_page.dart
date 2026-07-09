@@ -3,7 +3,7 @@ import 'package:dio_complete/core/widgets/app_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:dio_complete/features/auth/presentation/controllers/login_controller.dart';
+import 'package:dio_complete/features/login/presentation/controllers/login_controller.dart';
 import 'package:svg_image/svg_image.dart';
 
 class LoginPage extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dio_complete/core/storage/token_storage.dart';
-import 'package:dio_complete/features/auth/domain/usecases/auth_usecase.dart';
+import 'package:dio_complete/features/login/domain/usecases/auth_usecase.dart';
 import 'package:dio_complete/routes/app_routes.dart';
 
 class LoginController extends GetxController {

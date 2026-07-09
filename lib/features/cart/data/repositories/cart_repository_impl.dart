@@ -110,6 +110,16 @@ class CartRepositoryImpl implements CartRepository {
   }
 
   @override
+  Future<void> updateProduct(Product updated) async {
+    final items = loadItems();
+    final idx = items.indexWhere((e) => e.product.id == updated.id);
+    if (idx < 0) return; // sản phẩm này không có trong giỏ, không cần làm gì
+
+    items[idx] = CartItem(product: updated, quantity: items[idx].quantity);
+    await _save(items);
+  }
+
+  @override
   Future<void> clearAll() async {
     await _box.delete(_key);
   }

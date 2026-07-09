@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:dio_complete/core/widgets/confirm_dialog.dart';
 import 'package:dio_complete/features/cart/domain/entities/cart_item.dart';
 import 'package:dio_complete/features/cart/domain/usecases/cart_usecase.dart';
+import 'package:dio_complete/features/product/data/models/product_model.dart';
 import 'package:dio_complete/routes/app_routes.dart';
 
 class CartController extends GetxController {
@@ -93,6 +94,14 @@ class CartController extends GetxController {
     if (!confirmed) return;
 
     await _cartUseCase.clearAll();
+    _loadCart();
+  }
+
+  /// Đồng bộ lại thông tin sản phẩm trong giỏ khi nó vừa được sửa ở nơi khác
+  /// (trang chi tiết) - nếu không, giỏ hàng sẽ tiếp tục hiện tên/giá cũ vì
+  /// nó lưu 1 bản snapshot Product riêng, không tự động làm mới.
+  Future<void> updateProductInList(Product updated) async {
+    await _cartUseCase.updateProduct(updated);
     _loadCart();
   }
 }

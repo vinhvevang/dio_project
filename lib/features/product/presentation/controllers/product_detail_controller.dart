@@ -7,6 +7,7 @@ import 'package:dio_complete/features/cart/domain/usecases/cart_usecase.dart';
 import 'package:dio_complete/features/product/data/models/product_model.dart';
 import 'package:dio_complete/features/product/domain/usecases/product_usecase.dart';
 import 'package:dio_complete/features/product/presentation/controllers/home_controller.dart';
+import 'package:dio_complete/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:dio_complete/routes/app_routes.dart';
 
 class ProductDetailController extends GetxController {
@@ -79,6 +80,17 @@ class ProductDetailController extends GetxController {
       product.value = updated;
       if (Get.isRegistered<HomeController>()) {
         Get.find<HomeController>().updateProductInList(updated);
+      }
+      // Giỏ hàng lưu snapshot Product riêng trong Hive nên cần đồng bộ lại.
+      // Nếu CartController đang sống (đã từng mở màn Giỏ hàng trong phiên
+      // này) thì gọi qua nó để danh sách đang hiển thị được làm mới NGAY.
+      // Nếu chưa (chưa đăng ký), vẫn phải ghi thẳng qua _cartUseCase (đăng ký
+      // global, luôn tồn tại) để dữ liệu lưu trong Hive đúng ngay từ bây giờ
+      // - nếu không, lần đầu mở màn Giỏ hàng sau đó vẫn sẽ đọc ra bản cũ.
+      if (Get.isRegistered<CartController>()) {
+        await Get.find<CartController>().updateProductInList(updated);
+      } else {
+        await _cartUseCase.updateProduct(updated);
       }
     } else if (updated == true) {
       // Reload lại thông tin sau khi sửa

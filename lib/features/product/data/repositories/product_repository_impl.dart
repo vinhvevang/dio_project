@@ -25,7 +25,10 @@ class ProductRepositoryImpl implements ProductRepository {
       node = [node];
     }
 
-    return node.whereType<Map>().map((item) => Product.fromJson(_asMap(item))).toList();
+    return node
+        .whereType<Map>()
+        .map((item) => Product.fromJson(_asMap(item)))
+        .toList();
   }
 
   Map<String, dynamic> _extractSingleProductMap(dynamic raw) {
@@ -90,7 +93,8 @@ class ProductRepositoryImpl implements ProductRepository {
       final paging = response.data is Map ? response.data['paging'] : null;
       final pagingMap = paging is Map ? paging : <String, dynamic>{};
       final rawCount = pagingMap['count'];
-      final int? count = rawCount is num && rawCount > 0 ? rawCount.toInt() : null;
+      final int? count =
+          rawCount is num && rawCount > 0 ? rawCount.toInt() : null;
       return ProductResult(
         products: products,
         page: pagingMap['page'] is int ? pagingMap['page'] as int : page,
@@ -128,18 +132,21 @@ class ProductRepositoryImpl implements ProductRepository {
     required Category category,
   }) async {
     try {
-      final response = await ApiClient.dio.post('/products', data: {
-        'name': name,
-        'code': code,
-        'price': price,
-        'stock': stock,
-        'description': description,
-        'image': image,
-        // Ghi (POST/PUT) dùng category_id (số) - khác với đọc (GET) trả về
-        // object "category" lồng đầy đủ. Xác nhận từ dữ liệu JSON thật lấy
-        // về: sản phẩm đã gán danh mục qua field này thành công ở backend.
-        'category_id': category.id,
-      });
+      final response = await ApiClient.dio.post(
+        '/products',
+        data: {
+          'name': name,
+          'code': code,
+          'price': price,
+          'stock': stock,
+          'description': description,
+          'image': image,
+          // Ghi (POST/PUT) dùng category_id (số) - khác với đọc (GET) trả về
+          // object "category" lồng đầy đủ. Xác nhận từ dữ liệu JSON thật lấy
+          // về: sản phẩm đã gán danh mục qua field này thành công ở backend.
+          'category_id': category.id,
+        },
+      );
       dynamic node = response.data;
       if (node is Map && node.containsKey('data')) {
         node = node['data'];
@@ -149,11 +156,13 @@ class ProductRepositoryImpl implements ProductRepository {
         // Đảm bảo category luôn đúng như vừa chọn, phòng khi response backend
         // không echo lại object category đầy đủ (client vẫn nhất quán với ý
         // định của người dùng).
-        return Product.fromJson(_extractSingleProductMap(node))
-            .copyWith(category: category);
+        return Product.fromJson(
+          _extractSingleProductMap(node),
+        ).copyWith(category: category);
       }
 
-      final int createdId = node is int ? node : DateTime.now().millisecondsSinceEpoch;
+      final int createdId =
+          node is int ? node : DateTime.now().millisecondsSinceEpoch;
       return _buildLocalProduct(
         id: createdId,
         name: name,
@@ -167,7 +176,9 @@ class ProductRepositoryImpl implements ProductRepository {
     } on DioException catch (e) {
       throw Exception(dioErrorMessage(e, 'Tạo sản phẩm thất bại'));
     } catch (e) {
-      throw Exception('Lỗi xử lý dữ liệu sản phẩm: ${e.toString().replaceAll('Exception: ', '')}');
+      throw Exception(
+        'Lỗi xử lý dữ liệu sản phẩm: ${e.toString().replaceAll('Exception: ', '')}',
+      );
     }
   }
 
@@ -183,27 +194,39 @@ class ProductRepositoryImpl implements ProductRepository {
     required Category category,
   }) async {
     try {
-      final response = await ApiClient.dio.put('/products/$id', data: {
-        'name': name,
-        'code': code,
-        'price': price,
-        'stock': stock,
-        'description': description,
-        'image': image,
-        'category_id': category.id,
-      });
+      final oldProduct = await getProductDetail(id);
+      final response = await ApiClient.dio.put(
+        '/products/$id',
+        data: {
+          'name': name,
+          'code': code,
+          'price': price,
+          'stock': stock,
+          'description': description,
+          'image': image,
+          'category_id': category.id,
+        },
+      );
+
       dynamic node = response.data;
       if (node is Map && node.containsKey('data')) {
         node = node['data'];
       }
 
       if (node is Map || node is List) {
-        return Product.fromJson(_extractSingleProductMap(node))
-            .copyWith(category: category);
+        final updated = Product.fromJson(_extractSingleProductMap(node));
+        return updated.copyWith(
+          createdAt: oldProduct.createdAt, // giữ đúng ngày tạo gốc
+          category: category,
+        );
       }
 
-      return _buildLocalProduct(
-        id: id,
+      // Backend không trả về object sản phẩm đầy đủ (fallback) -> dựng lại
+      // từ SẢN PHẨM GỐC (oldProduct) đã lấy ở trên, chỉ thay field vừa sửa +
+      // updatedAt. Trước đây dùng _buildLocalProduct() ở đây (giống hệt hàm
+      // dùng cho TẠO MỚI) nên luôn set createdAt = now -> đúng nguyên nhân
+      // bug "ngày tạo = ngày cập nhật" khi rơi vào nhánh fallback này.
+      return oldProduct.copyWith(
         name: name,
         code: code,
         price: price,
@@ -211,11 +234,14 @@ class ProductRepositoryImpl implements ProductRepository {
         description: description,
         image: image,
         category: category,
+        updatedAt: DateTime.now().toIso8601String(),
       );
     } on DioException catch (e) {
       throw Exception(dioErrorMessage(e, 'Cập nhật sản phẩm thất bại'));
     } catch (e) {
-      throw Exception('Lỗi xử lý dữ liệu sản phẩm: ${e.toString().replaceAll('Exception: ', '')}');
+      throw Exception(
+        'Lỗi xử lý dữ liệu sản phẩm: ${e.toString().replaceAll('Exception: ', '')}',
+      );
     }
   }
 

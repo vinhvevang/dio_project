@@ -20,6 +20,9 @@ class CartUseCase {
 
   Future<void> removeItem(int productId) => _repository.removeItem(productId);
 
+  Future<void> updateProduct(Product updated) =>
+      _repository.updateProduct(updated);
+
   Future<void> clearAll() => _repository.clearAll();
 
   int get count => _repository.count;

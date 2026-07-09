@@ -111,6 +111,18 @@ class ProductDetailController extends GetxController {
     isLoading.value = true;
     try {
       await _useCase.deleteProduct(_productId);
+
+      // Sản phẩm vừa bị xóa hẳn -> nếu đang có trong giỏ hàng thì phải xóa
+      // luôn ở đó, không thì giỏ hàng còn giữ 1 sản phẩm không còn tồn tại
+      // (bấm vào sẽ lỗi, hoặc vẫn "thanh toán" được thứ đã bị xóa). Áp dụng
+      // đúng pattern như goToEdit(): luôn ghi thẳng qua _cartUseCase để chắc
+      // chắn dữ liệu Hive đúng dù CartController có đang sống hay không.
+      if (Get.isRegistered<CartController>()) {
+        await Get.find<CartController>().removeProductFromList(_productId);
+      } else {
+        await _cartUseCase.removeItem(_productId);
+      }
+
       // Quay về list, báo list tự reload
       Get.back(result: true);
       await showAppMessageDialog(

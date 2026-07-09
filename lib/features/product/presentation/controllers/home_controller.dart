@@ -257,10 +257,13 @@ class HomeController extends GetxController {
   }
 
   // ─── Điều hướng ───────────────────────────────────────────────
-  void goToDetail(Product product) async {
-    final changed = await Get.toNamed(AppRoutes.productDetail, arguments: product);
-    if (changed == true) refresh();
+ void goToDetail(Product product) async {
+  final changed = await Get.toNamed(AppRoutes.productDetail, arguments: product);
+  if (changed == true) {
+    refresh();
+    _updateCartCount();
   }
+}
 
   void goToAddProduct() async {
     final created = await Get.toNamed(AppRoutes.productForm);

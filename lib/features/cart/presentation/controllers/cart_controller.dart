@@ -104,4 +104,13 @@ class CartController extends GetxController {
     await _cartUseCase.updateProduct(updated);
     _loadCart();
   }
+
+  /// Xóa 1 sản phẩm khỏi giỏ vì nó VỪA BỊ XÓA HẲN ở nơi khác (trang chi
+  /// tiết) - KHÔNG hỏi xác nhận lại, khác với removeItem() ở trên (người
+  /// dùng đã xác nhận xóa sản phẩm rồi, hỏi thêm 1 lần nữa cho việc xóa khỏi
+  /// giỏ là dư thừa/khó hiểu).
+  Future<void> removeProductFromList(int productId) async {
+    await _cartUseCase.removeItem(productId);
+    _loadCart();
+  }
 }
